@@ -1,138 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Deepak Sardar | Trader & Algo Specialist</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading Growth Calculator</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f2f7ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
       margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: #0d1117;
-      color: #c9d1d9;
+      font-size: clamp(14px, 2.5vw, 16px);
     }
-
-    header {
-      text-align: center;
-      padding: 3rem 1rem 1rem;
+    h2 {
+      color: #003366;
+      margin-bottom: 1.5rem;
+      font-size: clamp(1.5rem, 5vw, 2rem);
     }
-
-    header h1 {
-      color: #58a6ff;
-      font-size: 2.5rem;
+    .container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      width: 90%;
+      max-width: 400px;
+      margin-bottom: 2rem;
     }
-
-    header p {
-      font-size: 1.2rem;
+    label {
+      display: block;
+      margin-top: 0.75rem;
+      font-weight: bold;
+      color: #555;
+      font-size: clamp(14px, 2.5vw, 16px);
+    }
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.25rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: clamp(14px, 2.5vw, 16px);
+      min-height: 44px; /* Touch-friendly height */
+    }
+    input:focus {
+      outline: none;
+      border-color: #3399ff;
+      box-shadow: 0 0 5px rgba(51, 153, 255, 0.5);
+    }
+    #results {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      background: #e6f2ff;
+      border-left: 5px solid #3399ff;
+      border-radius: 6px;
+      font-size: clamp(13px, 2.5vw, 15px);
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      margin: 1rem 0;
+      background: #3399ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: clamp(14px, 2.5vw, 16px);
+      cursor: pointer;
+      min-height: 44px;
+    }
+    button:hover, button:focus {
+      background: #287acc;
+      outline: none;
+    }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.25rem;
+      font-size: clamp(12px, 2.5vw, 14px);
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: right;
+    }
+    th {
+      background: #3399ff;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .note {
+      font-size: clamp(10px, 2vw, 12px);
+      color: gray;
       margin-top: 0.5rem;
     }
 
-    nav {
-      text-align: center;
-      margin-top: 2rem;
-    }
-
-    nav a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: #8b949e;
-      font-weight: 600;
-    }
-
-    .section {
-      padding: 3rem 1rem;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .section h2 {
-      color: #58a6ff;
-      margin-bottom: 1rem;
-    }
-
-    .links a {
-      display: block;
-      margin: 0.5rem 0;
-      color: #58a6ff;
-      text-decoration: none;
-    }
-
-    .skills span {
-      display: inline-block;
-      background-color: #161b22;
-      padding: 0.5rem 1rem;
-      margin: 0.4rem;
-      border-radius: 999px;
-      font-size: 0.9rem;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      color: #8b949e;
-      font-size: 0.9rem;
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 1rem;
+      }
+      h2 {
+        font-size: clamp(1.25rem, 4vw, 1.75rem);
+      }
+      input, button {
+        font-size: clamp(13px, 2.5vw, 15px);
+      }
+      table {
+        font-size: clamp(11px, 2vw, 13px);
+      }
+      th, td {
+        padding: 0.4rem;
+      }
     }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>Deepak Sardar</h1>
-    <p>📈 Trader | 🤖 Algo Strategist | Risk-Reward Obsessed</p>
-  </header>
+  <h2>Trading Growth Calculator</h2>
 
-  <nav>
-    <a href="#about">About</a>
-    <a href="#skills">Skills</a>
-    <a href="#links">Links</a>
-    <a href="#setup">Setup</a>
-  </nav>
+  <div class="container">
+    <label for="startBalance">Starting Balance:</label>
+    <input type="number" id="startBalance" value="20" min="1" step="1" oninput="calculateTrades()">
 
-  <section class="section" id="about">
-    <h2>About Me</h2>
-    <p>
-      I'm a full-time trader focused on precision-based execution using both manual and algorithmic strategies.
-      I specialize in high-probability setups in forex, crypto, and gold/USD markets.
-      I share my trades, analysis, and performance across multiple platforms to help others grow too.
-    </p>
-  </section>
+    <label for="targetBalance">Target Balance:</label>
+    <input type="number" id="targetBalance" value="1000000" min="1" step="1" oninput="calculateTrades()">
 
-  <section class="section" id="skills">
-    <h2>Trading Skills</h2>
-    <div class="skills">
-      <span>Algo Trading</span>
-      <span>Price Action</span>
-      <span>EMA / VWAP</span>
-      <span>Pivot Points</span>
-      <span>Risk Management</span>
-      <span>Backtesting</span>
-      <span>MT4 / MT5</span>
-      <span>Myfxbook Tracking</span>
+    <label for="winRate">Win Rate (%):</label>
+    <input type="number" id="winRate" value="55" min="1" max="100" oninput="calculateTrades()">
+
+    <label for="tpPercent">Take Profit (%):</label>
+    <input type="number" id="tpPercent" value="30" min="1" oninput="calculateTrades()">
+
+    <label for="slPercent">Stop Loss (%):</label>
+    <input type="number" id="slPercent" value="23" min="1" max="100" oninput="calculateTrades()">
+
+    <div id="results">
+      Total Trades Needed: <b>0</b><br>
+      Total Winning Trades: <b>0</b><br>
+      Total Losing Trades: <b>0</b><br>
+      Risk Reward: <b>0</b>
     </div>
-  </section>
-
-  <section class="section" id="links">
-    <h2>Social & Trading Links</h2>
-    <div class="links">
-      <a href="https://www.tradingview.com/u/yourusername/" target="_blank">📊 TradingView</a>
-      <a href="https://youtube.com/@yourchannel" target="_blank">🎥 YouTube</a>
-      <a href="https://instagram.com/yourusername" target="_blank">📸 Instagram</a>
-      <a href="https://www.myfxbook.com/members/yourusername" target="_blank">📈 Myfxbook</a>
-    </div>
-  </section>
-
-  <section class="section" id="setup">
-    <h2>Trading Setup</h2>
-    <p>
-      I trade using a multi-screen workspace with custom-coded indicators and trading bots.
-      I rely on a clean, minimal chart setup with tools like VWAP, EMAs, and key S/R levels.
-      Everything is optimized for fast execution, backtesting, and journaling.
-    </p>
-    <!-- You can add setup photos or a YouTube video walkthrough here -->
-  </section>
-
-  <div class="footer">
-    &copy; 2025 Deepak Sardar. Built for the markets. Stay Blest.
   </div>
+
+  <button onclick="openTradingJourney()">Open Trading Journey in New Tab</button>
+
+  <script>
+    function calculateTrades() {
+      let startBalanceInput = parseFloat(document.getElementById('startBalance').value) || 0;
+      let targetBalance = parseFloat(document.getElementById('targetBalance').value) || 0;
+      let winRatePercent = parseFloat(document.getElementById('winRate').value) || 0;
+      let winRate = winRatePercent / 100;
+      let tpPercent = parseFloat(document.getElementById('tpPercent').value) / 100 || 0;
+      let slPercent = parseFloat(document.getElementById('slPercent').value) / 100 || 0;
+
+      if (startBalanceInput < 1 || targetBalance < 1 || winRate <= 0 || tpPercent <= 0 || slPercent <= 0 || slPercent > 1 || winRate > 1) {
+        document.getElementById('results').innerHTML = `<span style="color:red;">Please fill all fields correctly.</span>`;
+        return;
+      }
+
+      let winMultiplier = 1 + tpPercent;
+      let lossMultiplier = 1 - slPercent;
+      let growthPerTrade = Math.pow(winMultiplier, winRate) * Math.pow(lossMultiplier, (1 - winRate));
+
+      let exactTrades = Math.log(targetBalance / startBalanceInput) / Math.log(growthPerTrade);
+      let trades = Math.ceil(exactTrades); // Fixed typo here
+      let totalWins = Math.ceil(trades * winRate);
+      let totalLosses = trades - totalWins;
+      let riskReward = (tpPercent / slPercent).toFixed(2);
+
+      document.getElementById('results').innerHTML = `
+        Total Trades Needed: <b>${trades}</b><br>
+        Total Winning Trades: <b>${totalWins}</b><br>
+        Total Losing Trades: <b>${totalLosses}</b><br>
+        Risk Reward: <b>${riskReward} : 1</b>
+      `;
+    }
+
+    function openTradingJourney() {
+      const newTab = window.open("", "_blank");
+      newTab.document.write(`
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Trading Journey</title>
+          <style>
+            * {
+              box-sizing: border-box;
+            }
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              background: #f2f7ff;
+              padding: 20px;
+              margin: 0;
+              font-size: clamp(14px, 2.5vw, 16px);
+            }
+            h2 {
+              color: #003366;
+              margin-bottom: 1.5rem;
+              font-size: clamp(1.5rem, 5vw, 2rem);
+            }
+            .table-container {
+              width: 100%;
+              overflow-x: auto;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 1.25rem;
+              font-size: clamp(12px, 2.5vw, 14px);
+            }
+            th, td {
+              border: 1px solid #ccc;
+              padding: 0.5rem;
+              text-align: right;
+            }
+            th {
+              background: #3399ff;
+              color: white;
+            }
+            tr:nth-child(even) {
+              background: #f9f9f9;
+            }
+            .note {
+              font-size: clamp(10px, 2vw, 12px);
+              color: gray;
+              margin-top: 0.5rem;
+            }
+            @media (max-width: 600px) {
+              body {
+                padding: 10px;
+              }
+              h2 {
+                font-size: clamp(1.25rem, 4vw, 1.75rem);
+              }
+              table {
+                font-size: clamp(11px, 2vw, 13px);
+              }
+              th, td {
+                padding: 0.4rem;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Trading Journey</h2>
+          <div class="note">* Table assumes calculation based on 100% Win Rate.</div>
+          <div class="table-container">
+            <table id="journeyTable">
+              <thead>
+                <tr>
+                  <th>Level</th>
+                  <th>Starting Bal</th>
+                  <th>Profit/Loss</th>
+                  <th>Closing Bal</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </body>
+        </html>
+      `);
+      newTab.document.close();
+
+      let journeyTableBody = newTab.document.getElementById('journeyTable').querySelector('tbody');
+      let startingBalance = parseFloat(document.getElementById('startBalance').value) || 0;
+      let targetBalance = parseFloat(document.getElementById('targetBalance').value) || 0;
+      let winRatePercent = parseFloat(document.getElementById('winRate').value) || 0;
+      let winRate = winRatePercent / 100;
+      let tpPercent = parseFloat(document.getElementById('tpPercent').value) / 100 || 0;
+      let slPercent = parseFloat(document.getElementById('slPercent').value) / 100 || 0;
+
+      let winMultiplier = 1 + tpPercent;
+      let lossMultiplier = 1 - slPercent;
+      let growthPerTrade = Math.pow(winMultiplier, winRate) * Math.pow(lossMultiplier, (1 - winRate));
+
+      let exactTrades = Math.log(targetBalance / startingBalance) / Math.log(growthPerTrade);
+      let trades = Math.ceil(exactTrades);
+      let totalWins = Math.ceil(trades * winRate);
+      let totalLosses = trades - totalWins;
+
+      let winsRemaining = totalWins;
+      let lossesRemaining = totalLosses;
+      let levels = Math.min(trades, 1000);
+
+      for (let level = 1; level <= levels; level++) {
+        let profitLoss, closingBalance;
+
+        if (winsRemaining > 0) {
+          profitLoss = startingBalance * tpPercent;
+          closingBalance = startingBalance + profitLoss;
+          winsRemaining--;
+        } else if (lossesRemaining > 0) {
+          profitLoss = -startingBalance * slPercent;
+          closingBalance = startingBalance + profitLoss;
+          lossesRemaining--;
+        }
+
+        let newRow = newTab.document.createElement('tr');
+        newRow.innerHTML = `
+          <td style="text-align:center;">${level}</td>
+          <td>$${formatNumber(startingBalance)}</td>
+          <td>$${formatNumber(profitLoss)}</td>
+          <td><b>$${formatNumber(closingBalance)}</b></td>
+        `;
+        journeyTableBody.appendChild(newRow);
+
+        startingBalance = closingBalance;
+
+        if (startingBalance >= targetBalance) {
+          break;
+        }
+      }
+    }
+
+    function formatNumber(num) {
+      return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    window.onload = calculateTrades;
+  </script>
 </body>
 </html>
