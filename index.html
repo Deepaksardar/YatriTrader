@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trading Growth Calculator</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f2f7ff;
@@ -37,16 +35,20 @@
       margin-top: 0.75rem;
       font-weight: bold;
       color: #555;
-      font-size: clamp(14px, 2.5vw, 16px);
     }
-    input {
+    input[type="number"] {
       width: 100%;
       padding: 0.75rem;
       margin-top: 0.25rem;
       border: 1px solid #ccc;
       border-radius: 6px;
+      min-height: 44px;
       font-size: clamp(14px, 2.5vw, 16px);
-      min-height: 44px; /* Touch-friendly height */
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="number"].error {
+      border-color: #e74c3c;
+      box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
     }
     input:focus {
       outline: none;
@@ -59,7 +61,6 @@
       background: #e6f2ff;
       border-left: 5px solid #3399ff;
       border-radius: 6px;
-      font-size: clamp(13px, 2.5vw, 15px);
     }
     button {
       display: block;
@@ -70,271 +71,177 @@
       color: white;
       border: none;
       border-radius: 6px;
-      font-size: clamp(14px, 2.5vw, 16px);
       cursor: pointer;
       min-height: 44px;
+      font-size: clamp(14px, 2.5vw, 16px);
     }
     button:hover, button:focus {
       background: #287acc;
       outline: none;
     }
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1.25rem;
-      font-size: clamp(12px, 2.5vw, 14px);
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: right;
-    }
-    th {
-      background: #3399ff;
-      color: white;
-    }
-    tr:nth-child(even) {
-      background: #f9f9f9;
-    }
-    .note {
-      font-size: clamp(10px, 2vw, 12px);
-      color: gray;
-      margin-top: 0.5rem;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-      .container {
-        padding: 1rem;
-      }
-      h2 {
-        font-size: clamp(1.25rem, 4vw, 1.75rem);
-      }
-      input, button {
-        font-size: clamp(13px, 2.5vw, 15px);
-      }
-      table {
-        font-size: clamp(11px, 2vw, 13px);
-      }
-      th, td {
-        padding: 0.4rem;
-      }
-    }
   </style>
 </head>
-
 <body>
-  <h2>Trading Growth Calculator</h2>
 
-  <div class="container">
-    <label for="startBalance">Starting Balance:</label>
-    <input type="number" id="startBalance" value="20" min="1" step="1" oninput="calculateTrades()">
+<h2>Trading Growth Calculator</h2>
 
-    <label for="targetBalance">Target Balance:</label>
-    <input type="number" id="targetBalance" value="1000000" min="1" step="1" oninput="calculateTrades()">
+<div class="container">
+  <label for="startBalance">Starting Balance:</label>
+  <input type="number" id="startBalance" value="20" min="1" oninput="calculateTrades()">
 
-    <label for="winRate">Win Rate (%):</label>
-    <input type="number" id="winRate" value="55" min="1" max="100" oninput="calculateTrades()">
+  <label for="targetBalance">Target Balance:</label>
+  <input type="number" id="targetBalance" value="1000000" min="1" oninput="calculateTrades()">
 
-    <label for="tpPercent">Take Profit (%):</label>
-    <input type="number" id="tpPercent" value="30" min="1" oninput="calculateTrades()">
+  <label for="winRate">Win Rate (%):</label>
+  <input type="number" id="winRate" value="58" min="1" max="100" oninput="calculateTrades()">
 
-    <label for="slPercent">Stop Loss (%):</label>
-    <input type="number" id="slPercent" value="23" min="1" max="100" oninput="calculateTrades()">
+  <label for="tpPercent">Take Profit (%):</label>
+  <input type="number" id="tpPercent" value="30" min="1" oninput="calculateTrades()">
 
-    <div id="results">
-      Total Trades Needed: <b>0</b><br>
-      Total Winning Trades: <b>0</b><br>
-      Total Losing Trades: <b>0</b><br>
-      Risk Reward: <b>0</b>
-    </div>
-  </div>
+  <label for="slPercent">Stop Loss (%):</label>
+  <input type="number" id="slPercent" value="30" min="1" oninput="calculateTrades()">
 
-  <button onclick="openTradingJourney()">Open Trading Journey in New Tab</button>
+  <div id="results"></div>
+</div>
 
-  <script>
-    function calculateTrades() {
-      let startBalanceInput = parseFloat(document.getElementById('startBalance').value) || 0;
-      let targetBalance = parseFloat(document.getElementById('targetBalance').value) || 0;
-      let winRatePercent = parseFloat(document.getElementById('winRate').value) || 0;
-      let winRate = winRatePercent / 100;
-      let tpPercent = parseFloat(document.getElementById('tpPercent').value) / 100 || 0;
-      let slPercent = parseFloat(document.getElementById('slPercent').value) / 100 || 0;
+<button onclick="openTradingJourney()">Open Trading Journey in New Tab</button>
 
-      if (startBalanceInput < 1 || targetBalance < 1 || winRate <= 0 || tpPercent <= 0 || slPercent <= 0 || slPercent > 1 || winRate > 1) {
-        document.getElementById('results').innerHTML = `<span style="color:red;">Please fill all fields correctly.</span>`;
-        return;
-      }
+<script>
+function calculateTrades() {
+  const startEl = document.getElementById('startBalance');
+  const targetEl = document.getElementById('targetBalance');
+  const winEl = document.getElementById('winRate');
+  const tpEl = document.getElementById('tpPercent');
+  const slEl = document.getElementById('slPercent');
+  const out = document.getElementById('results');
 
-      let winMultiplier = 1 + tpPercent;
-      let lossMultiplier = 1 - slPercent;
-      let growthPerTrade = Math.pow(winMultiplier, winRate) * Math.pow(lossMultiplier, (1 - winRate));
+  [startEl, targetEl, winEl, tpEl, slEl].forEach(el => el.classList.remove('error'));
 
-      let exactTrades = Math.log(targetBalance / startBalanceInput) / Math.log(growthPerTrade);
-      let trades = Math.ceil(exactTrades); // Fixed typo here
-      let totalWins = Math.ceil(trades * winRate);
-      let totalLosses = trades - totalWins;
-      let riskReward = (tpPercent / slPercent).toFixed(2);
+  const startVal = parseFloat(startEl.value) || 0;
+  const targetVal = parseFloat(targetEl.value) || 0;
+  const winVal = parseFloat(winEl.value) || 0;
+  const tpVal = parseFloat(tpEl.value) || 0;
+  const slVal = parseFloat(slEl.value) || 0;
 
-      document.getElementById('results').innerHTML = `
-        Total Trades Needed: <b>${trades}</b><br>
-        Total Winning Trades: <b>${totalWins}</b><br>
-        Total Losing Trades: <b>${totalLosses}</b><br>
-        Risk Reward: <b>${riskReward} : 1</b>
-      `;
-    }
+  function setError(fields, msg) {
+    fields.forEach(f => f.classList.add('error'));
+    out.innerHTML = `<span style="color:#e74c3c;">${msg}</span>`;
+  }
 
-    function openTradingJourney() {
-      const newTab = window.open("", "_blank");
-      newTab.document.write(`
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Trading Journey</title>
-          <style>
-            * {
-              box-sizing: border-box;
-            }
-            body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              background: #f2f7ff;
-              padding: 20px;
-              margin: 0;
-              font-size: clamp(14px, 2.5vw, 16px);
-            }
-            h2 {
-              color: #003366;
-              margin-bottom: 1.5rem;
-              font-size: clamp(1.5rem, 5vw, 2rem);
-            }
-            .table-container {
-              width: 100%;
-              overflow-x: auto;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-top: 1.25rem;
-              font-size: clamp(12px, 2.5vw, 14px);
-            }
-            th, td {
-              border: 1px solid #ccc;
-              padding: 0.5rem;
-              text-align: right;
-            }
-            th {
-              background: #3399ff;
-              color: white;
-            }
-            tr:nth-child(even) {
-              background: #f9f9f9;
-            }
-            .note {
-              font-size: clamp(10px, 2vw, 12px);
-              color: gray;
-              margin-top: 0.5rem;
-            }
-            @media (max-width: 600px) {
-              body {
-                padding: 10px;
-              }
-              h2 {
-                font-size: clamp(1.25rem, 4vw, 1.75rem);
-              }
-              table {
-                font-size: clamp(11px, 2vw, 13px);
-              }
-              th, td {
-                padding: 0.4rem;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <h2>Trading Journey</h2>
-          <div class="note">* Table assumes calculation based on 100% Win Rate.</div>
-          <div class="table-container">
-            <table id="journeyTable">
-              <thead>
-                <tr>
-                  <th>Level</th>
-                  <th>Starting Bal</th>
-                  <th>Profit/Loss</th>
-                  <th>Closing Bal</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-        </body>
-        </html>
-      `);
-      newTab.document.close();
+  if (startVal < 1 || targetVal < 1 || winVal <= 0 || tpVal <= 0 || slVal <= 0) {
+    return setError([startEl, targetEl, winEl, tpEl, slEl], 'Please fill all fields correctly.');
+  }
+  if (targetVal < startVal) {
+    return setError([startEl, targetEl], 'Target must be greater than start.');
+  }
+  if (winVal > 100) {
+    return setError([winEl], 'Win rate cannot exceed 100%.');
+  }
+  if (slVal > 100) {
+    return setError([slEl], 'Stop loss cannot exceed 100%.');
+  }
 
-      let journeyTableBody = newTab.document.getElementById('journeyTable').querySelector('tbody');
-      let startingBalance = parseFloat(document.getElementById('startBalance').value) || 0;
-      let targetBalance = parseFloat(document.getElementById('targetBalance').value) || 0;
-      let winRatePercent = parseFloat(document.getElementById('winRate').value) || 0;
-      let winRate = winRatePercent / 100;
-      let tpPercent = parseFloat(document.getElementById('tpPercent').value) / 100 || 0;
-      let slPercent = parseFloat(document.getElementById('slPercent').value) / 100 || 0;
+  const winRate = winVal / 100;
+  const tpPct = tpVal / 100;
+  const slPct = slVal / 100;
+  const winMultiplier = 1 + tpPct;
+  const lossMultiplier = 1 - slPct;
+  const growthPerTrade = Math.pow(winMultiplier, winRate) * Math.pow(lossMultiplier, 1 - winRate);
+  const rr = (tpPct / slPct).toFixed(2);
 
-      let winMultiplier = 1 + tpPercent;
-      let lossMultiplier = 1 - slPercent;
-      let growthPerTrade = Math.pow(winMultiplier, winRate) * Math.pow(lossMultiplier, (1 - winRate));
+  if (growthPerTrade <= 1) {
+    out.innerHTML = `
+      <span style="color:#e74c3c; font-weight: bold;">IMPOSSIBLE TO GROW with current settings!</span><br>
+      Risk Reward: <b>${rr} : 1</b>
+    `;
+    return;
+  }
 
-      let exactTrades = Math.log(targetBalance / startingBalance) / Math.log(growthPerTrade);
-      let trades = Math.ceil(exactTrades);
-      let totalWins = Math.ceil(trades * winRate);
-      let totalLosses = trades - totalWins;
+  const exactTrades = Math.log(targetVal / startVal) / Math.log(growthPerTrade);
+  const trades = Math.ceil(exactTrades);
+  const wins = Math.ceil(trades * winRate);
+  const losses = trades - wins;
 
-      let winsRemaining = totalWins;
-      let lossesRemaining = totalLosses;
-      let levels = Math.min(trades, 1000);
+  out.innerHTML = `
+    Total Trades Needed: <b>${trades}</b><br>
+    Total Winning Trades: <b>${wins}</b><br>
+    Total Losing Trades: <b>${losses}</b><br>
+    Risk Reward: <b>${rr} : 1</b>
+  `;
+}
 
-      for (let level = 1; level <= levels; level++) {
-        let profitLoss, closingBalance;
+function openTradingJourney() {
+  const newTab = window.open("", "_blank");
+  newTab.document.write(`
+    <html lang='en'>
+    <head><meta charset='UTF-8'><title>Trading Journey</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: sans-serif; padding: 20px; background: white; text-align: center; }
+      table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 14px; }
+      th, td { border: 1px solid #999; padding: 8px; text-align: center; }
+      th { background: #3399ff; color: white; }
+      tr:nth-child(even) { background: #f9f9f9; }
+      .instructions { margin-top: 20px; font-size: 13px; color: #555; text-align: left; }
+      .checkbox-group { display: flex; justify-content: center; gap: 4px; }
+    </style>
+    </head>
+    <body>
+      <h2>Trading Journey</h2>
+      <table><thead><tr>
+        <th>Level</th>
+        <th>Starting Bal</th>
+        <th>Profit/Loss</th>
+        <th>Closing Bal</th>
+        <th>Milestones (Tick)</th>
+      </tr></thead>
+      <tbody id='journeyTable'></tbody>
+      <div class='instructions'>
+        <b>Instructions:</b><br>
+        1. Print this sheet.<br>
+        2. Tick the checkbox after crossing each milestone.<br>
+        3. Celebrate every small win!
+      </div>
+    </body></html>
+  `);
+  newTab.document.close();
 
-        if (winsRemaining > 0) {
-          profitLoss = startingBalance * tpPercent;
-          closingBalance = startingBalance + profitLoss;
-          winsRemaining--;
-        } else if (lossesRemaining > 0) {
-          profitLoss = -startingBalance * slPercent;
-          closingBalance = startingBalance + profitLoss;
-          lossesRemaining--;
-        }
+  let tbody = newTab.document.getElementById('journeyTable');
+  let startingBalance = parseFloat(document.getElementById('startBalance').value) || 0;
+  let targetBalance = parseFloat(document.getElementById('targetBalance').value) || 0;
+  let tpPercent = (parseFloat(document.getElementById('tpPercent').value) || 0) / 100;
+  let winRate = (parseFloat(document.getElementById('winRate').value) || 0) / 100;
+  let slPercent = (parseFloat(document.getElementById('slPercent').value) || 0) / 100;
+  let winMultiplier = 1 + tpPercent;
+  let lossMultiplier = 1 - slPercent;
+  let growthPerTrade = Math.pow(winMultiplier, winRate) * Math.pow(lossMultiplier, 1 - winRate);
+  let trades = Math.ceil(Math.log(targetBalance / startingBalance) / Math.log(growthPerTrade));
+  let winsRemaining = Math.ceil(trades * winRate);
 
-        let newRow = newTab.document.createElement('tr');
-        newRow.innerHTML = `
-          <td style="text-align:center;">${level}</td>
-          <td>$${formatNumber(startingBalance)}</td>
-          <td>$${formatNumber(profitLoss)}</td>
-          <td><b>$${formatNumber(closingBalance)}</b></td>
-        `;
-        journeyTableBody.appendChild(newRow);
+  for (let level = 1; level <= winsRemaining; level++) {
+    let profit = startingBalance * tpPercent;
+    let closingBalance = startingBalance + profit;
+    let newRow = newTab.document.createElement('tr');
+    newRow.innerHTML = `
+      <td>${level}</td>
+      <td>$${formatNumber(startingBalance)}</td>
+      <td>+$${formatNumber(profit)}</td>
+      <td><b>$${formatNumber(closingBalance)}</b></td>
+      <td class='checkbox-group'>${'<input type="checkbox">'.repeat(10)}</td>
+    `;
+    tbody.appendChild(newRow);
+    startingBalance = closingBalance;
+    if (startingBalance >= targetBalance) break;
+  }
+}
 
-        startingBalance = closingBalance;
+function formatNumber(num) {
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
-        if (startingBalance >= targetBalance) {
-          break;
-        }
-      }
-    }
+// Run once on page load
+window.onload = calculateTrades;
+</script>
 
-    function formatNumber(num) {
-      return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    window.onload = calculateTrades;
-  </script>
 </body>
 </html>
